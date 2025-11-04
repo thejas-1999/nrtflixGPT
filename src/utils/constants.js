@@ -32,3 +32,5 @@ export const SUPPORTED_LANG = [
     name: "Malayalam",
   },
 ];
+
+export const GEMINI_KEY = "AIzaSyBn10qzY7lxALqs5nspfYR-9yX-g-GNNPs";
