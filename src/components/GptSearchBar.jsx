@@ -25,7 +25,7 @@ const GptSearchBar = () => {
     const query = searchText.current.value.trim();
     if (!query) return;
 
-    const prompt = `Act as a movie recommendation system and suggest  5 movies for: ${query}.
+    const prompt = `Act as a movie recommendation system and suggest  atleast one movie for: ${query}.
   Give only names, comma separated. Example: Kill, Sholay, Don, Golmaal, Koi Mil Gaya`;
 
     try {
@@ -57,7 +57,7 @@ const GptSearchBar = () => {
       });
 
       const allResults = await Promise.all(moviePromises);
-      const tmdbMovies = allResults.flat();
+      const tmdbMovies = allResults;
       dispatch(
         addGptMovieResults({
           movieNames: genAIMovies,
