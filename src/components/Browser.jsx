@@ -7,6 +7,7 @@ import GPTSearch from "./GPTSearch";
 import Header from "./Header";
 import MainContainer from "./MainContainer";
 import SecondaryContainer from "./SecondaryContainer";
+import MovieModal from "./movieModel";
 
 const Browser = () => {
   const showGptSearch = useSelector((store) => store.gpt.showGptSearch);
@@ -26,6 +27,7 @@ const Browser = () => {
           <SecondaryContainer />{" "}
         </>
       )}
+      <MovieModal />
     </>
   );
 };

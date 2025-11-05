@@ -1,8 +1,14 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Browser from "./Browser";
 import Login from "./Login";
-
+import LoadingSpinner from "./LoadingSpinner";
+import { useEffect, useState } from "react";
 const Body = () => {
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000); // simulate load
+    return () => clearTimeout(timer);
+  }, []);
   const appRouter = createBrowserRouter([
     {
       path: "/",
@@ -16,7 +22,7 @@ const Body = () => {
 
   return (
     <div>
-      <RouterProvider router={appRouter} />
+      {loading ? <LoadingSpinner /> : <RouterProvider router={appRouter} />}
     </div>
   );
 };

@@ -1,14 +1,16 @@
 import { useDispatch, useSelector } from "react-redux";
 import lang from "../utils/languageConstants";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import genAI from "../utils/geminiAI";
 import { API_OPTIONS } from "../utils/constants";
 import { addGptMovieResults } from "../utils/gptSlice";
+import LoadingSpinner from "./LoadingSpinner"; // 👈 import your spinner
 
 const GptSearchBar = () => {
   const langKey = useSelector((store) => store.config.preferdLanguage);
   const dispatch = useDispatch();
   const searchText = useRef(null);
+  const [loading, setLoading] = useState(false); // 👈 loading state
 
   const searchMovieTMDB = async (movie) => {
     const data = await fetch(
@@ -25,8 +27,10 @@ const GptSearchBar = () => {
     const query = searchText.current.value.trim();
     if (!query) return;
 
-    const prompt = `Act as a movie recommendation system and suggest  atleast one movie for: ${query}.
-  Give only names, comma separated. Example: Kill, Sholay, Don, Golmaal, Koi Mil Gaya`;
+    setLoading(true); // 👈 start spinner
+
+    const prompt = `Act as a movie recommendation system and suggest atleast 5 movies for: ${query}.
+Give only names, comma separated. Example: Kill, Sholay, Don, Golmaal, Koi Mil Gaya`;
 
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -38,43 +42,44 @@ const GptSearchBar = () => {
         .map((m) => m.trim())
         .filter((m) => m.length > 0);
 
-      console.log("🎬 GenAI Suggested Movies:", genAIMovies);
-
       const moviePromises = genAIMovies.map(async (movie) => {
         const tmdbResults = await searchMovieTMDB(movie);
-
-        // Filter only exact title matches (case-insensitive)
         const exactMatches = tmdbResults.filter((r) => {
           const tmdbTitle = r.title?.toLowerCase().trim() || "";
           const queryTitle = movie.toLowerCase().trim();
           return tmdbTitle === queryTitle;
         });
-
-        // Return matches or a notFound placeholder
         return exactMatches.length > 0
           ? exactMatches
           : [{ title: movie, notFound: true }];
       });
 
       const allResults = await Promise.all(moviePromises);
-      const tmdbMovies = allResults;
       dispatch(
         addGptMovieResults({
           movieNames: genAIMovies,
-          movieResults: tmdbMovies,
+          movieResults: allResults,
         })
       );
-
-      console.log("🎥 Exact-Match TMDB Movies:", tmdbMovies);
     } catch (err) {
       console.error("Error calling Gemini API:", err);
+    } finally {
+      setLoading(false); // 👈 stop spinner
     }
   };
 
   return (
-    <div className="p-[10%] flex justify-center">
+    <div className="p-[10%] flex justify-center relative">
+      {loading && (
+        <div className="absolute inset-0 flex justify-center items-center bg-black/70 rounded-lg z-10">
+          <LoadingSpinner /> {/* 👈 your animated spinner */}
+        </div>
+      )}
+
       <form
-        className="w-1/2 bg-black grid grid-cols-12"
+        className={`w-1/2 bg-black grid grid-cols-12 transition-opacity duration-300 ${
+          loading ? "opacity-50 pointer-events-none" : "opacity-100"
+        }`}
         onSubmit={(e) => e.preventDefault()}
       >
         <input
