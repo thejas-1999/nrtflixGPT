@@ -7,14 +7,19 @@ const MovieCard = ({ posterPath, movie }) => {
   if (!posterPath) return null;
 
   return (
-    <div className="w-48  pr-4">
+    <div className="flex-shrink-0 w-36 sm:w-48 md:w-52 lg:w-56 pr-3">
       <div
-        className="w-48 pr-4 cursor-pointer hover:scale-105 transition-transform duration-200"
+        className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
         onClick={() => dispatch(openMovieModal(movie))}
       >
-        <img src={IMG_CDN_URL + posterPath} alt="movie-card" />
+        <img
+          src={IMG_CDN_URL + posterPath}
+          alt={movie?.title || "movie-card"}
+          className="w-full h-auto rounded-lg"
+        />
       </div>
     </div>
   );
 };
+
 export default MovieCard;
